@@ -1,13 +1,16 @@
-# Expo Map Extension
+# react-native-mapkit-search
 
-**Expo Map Extension** is a React Native package that allows iOS apps to connect to Apple's MapKit API for location search and autofill. It integrates with `react-native-maps` and provides search functionality, returning place data and coordinates to your app.
+This package is **not** associated with expo. It's name reflects its utility in EAS (expo modules). 
+
+A React Native package that integrates with Apple's MapKit API to provide location search with autofill suggestions. Designed to work seamlessly with `react-native-maps`, this package enables location-based searches on iOS devices.
 
 ## Features
 
-- Search for places using Apple's API when running on iPhones.
-- Autofill search results displayed in a sheet view.
-- Select a place from the search results to pass back to the React Native app.
-- Receive place details, including coordinates, to populate your app's map.
+- **Search with autofill**: Users can enter a query, and the package returns a list of matching places.
+- **Select a place**: Clicking on a search result passes the selected location back to the React Native app.
+- **Coordinates provided**: Useful for displaying locations on a map or performing other location-based actions.
+- **Seamless integration with `react-native-maps`**: Use this package to fetch locations and display them using `react-native-maps`.
+
 
 ## Installation
 
