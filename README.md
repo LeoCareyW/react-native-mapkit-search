@@ -32,26 +32,21 @@ const MyComponent = () => {
   const [searchText, setSearchText] = useState('')
   const [placesData, setPlacesData] = useState([])
   const [selectedItem, setSelectedItem] = useState(null)
-  const [isDisplay, setIsDisplay] = useState(true)
 
   return (
     <View style={{ flex: 1 }}>
-      <Text style={{ marginTop: 20 }}>Hello There</Text>
       <TextInput
         placeholder="Search here"
         value={searchText}
         onChangeText={setSearchText}
-        style={{ borderColor: 'black', borderWidth: 1 }}
+        style={{ borderColor: 'black', borderWidth: 1, borderRadius: 4 }}
       />
-      <Button onPress={() => setIsDisplay(!isDisplay)} title="Toggle map" />
-      {isDisplay && (
         <ExpoMapExtension.ExpoMapExtensionView
           style={{ flex: 1, height: 1000, width: '100%' }}
           searchText={searchText}
           onSubmit={(event) => setPlacesData(event.nativeEvent.placesData)}
           onSelect={(event) => setSelectedItem(event.nativeEvent.selectedItem)}
         />
-      )}
     </View>
   )
 }
