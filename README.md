@@ -1,6 +1,6 @@
 # react-native-mapkit-search
 
-This package is **not** associated with expo. It's name reflects its utility in EAS (expo modules). 
+This package is **in no way** associated with Expo. It's name reflects its utility in EAS (expo modules). 
 
 A React Native package that integrates with Apple's MapKit API to provide location search with autofill suggestions. Designed to work seamlessly with `react-native-maps`, this package enables location-based searches on iOS devices.
 
