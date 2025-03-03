@@ -1,6 +1,6 @@
 {
   "name": "expo-map-extension",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "My new module",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -21,13 +21,13 @@
     "expo-map-extension",
     "ExpoMapExtension"
   ],
-  "repository": "https://github.com/LeoCareyW/expo-map-extension",
+  "repository": "https://github.com/LeoCareyW/react-native-mapkit-search",
   "bugs": {
-    "url": "https://github.com/LeoCareyW/expo-map-extension/issues"
+    "url": "https://github.com/LeoCareyW/react-native-mapkit-search/issues"
   },
   "author": "Leo Carey-Williams <lcw@risika.com> (https://github.com/LeoCareyW)",
   "license": "MIT",
-  "homepage": "https://github.com/LeoCareyW/expo-map-extension#readme",
+  "homepage": "https://github.com/LeoCareyW/react-native-mapkit-search#readme",
   "dependencies": {},
   "devDependencies": {
     "@types/react": "^18.0.25",
