@@ -1,35 +1,59 @@
-# expo-map-extension
+# react-native-mapkit-search
 
-My new module
+A React Native package that integrates with Apple's MapKit API to provide location search with autofill suggestions. Designed to work seamlessly with `react-native-maps`, this package enables location-based searches on iOS devices.
 
-# API documentation
+## Features
 
-- [Documentation for the main branch](https://github.com/expo/expo/blob/main/docs/pages/versions/unversioned/sdk/map-extension.md)
-- [Documentation for the latest stable release](https://docs.expo.dev/versions/latest/sdk/map-extension/)
+- **Search with autofill**: Users can enter a query, and the package returns a list of matching places.
+- **Select a place**: Clicking on a search result passes the selected location back to the React Native app.
+- **Coordinates provided**: Useful for displaying locations on a map or performing other location-based actions.
+- **Seamless integration with `react-native-maps`**: Use this package to fetch locations and display them using `react-native-maps`.
 
-# Installation in managed Expo projects
+## Installation
 
-For [managed](https://docs.expo.dev/archive/managed-vs-bare/) Expo projects, please follow the installation instructions in the [API documentation for the latest stable release](#api-documentation). If you follow the link and there is no documentation available then this library is not yet usable within managed projects &mdash; it is likely to be included in an upcoming Expo SDK release.
+npm install react-native-mapkit-search
 
-# Installation in bare React Native projects
+csharp
+Copy
+Edit
 
-For bare React Native projects, you must ensure that you have [installed and configured the `expo` package](https://docs.expo.dev/bare/installing-expo-modules/) before continuing.
+or with Yarn:
 
-### Add the package to your npm dependencies
+yarn add react-native-mapkit-search
 
-```
-npm install expo-map-extension
-```
+## Usage
 
-### Configure for iOS
+import React, { useState } from 'react' import { View, TextInput, Button } from 'react-native' import ExpoMapExtension from 'react-native-mapkit-search'
 
-Run `npx pod-install` after installing the npm package.
+const MapSearchExample = () => { const [searchText, setSearchText] = useState('') const [data, setData] = useState([]) const [selectedItem, setSelectedItem] = useState(null) const [isDisplay, setIsDisplay] = useState(true)
+
+return ( <View style={{ flex: 1 }}> <TextInput placeholder="Search here" value={searchText} onChangeText={(text) => setSearchText(text)} style={{ borderColor: 'black', borderWidth: 1 }} /> <Button onPress={() => setIsDisplay(!isDisplay)} title="Toggle map" /> {isDisplay && ( <ExpoMapExtension.ExpoMapExtensionView style={{ flex: 1, height: 1000, width: '100%' }} searchText={searchText} onSubmit={(event) => { setData(event.nativeEvent.placesData) }} onSelect={(event) => { setSelectedItem(event.nativeEvent.selectedItem) }} /> )} </View> ) }
+
+export default MapSearchExample
+
+## How It Works
+
+1. The user enters a search query in the React Native app.
+2. The package fetches search suggestions from Apple's MapKit API.
+3. A sheet view displays search results.
+4. When a user selects a place, its details (including coordinates) are sent back to the React Native app.
+5. The app can then use this data to show an enlarged map view, navigate, or perform any location-based functionality.
+
+## Requirements
+
+- **iOS only**: This package relies on Apple’s MapKit API.
+- **React Native Maps**: Optional, but recommended for displaying locations.
+
+## Contributing
+
+Feel free to open issues or submit pull requests.
+
+## License
+
+MIT
 
 
-### Configure for Android
 
 
 
-# Contributing
 
-Contributions are very welcome! Please refer to guidelines described in the [contributing guide]( https://github.com/expo/expo#contributing).
