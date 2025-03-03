@@ -1,11 +1,11 @@
-import * as React from 'react';
+import * as React from "react";
 
-import { ExpoMapExtensionViewProps } from './ExpoMapExtension.types';
+import { ExpoMapExtensionViewProps } from "./ExpoMapExtensionView";
 
 export default function ExpoMapExtensionView(props: ExpoMapExtensionViewProps) {
   return (
     <div>
-      <span>{props.name}</span>
+      <span>{props.searchText}</span>
     </div>
   );
 }

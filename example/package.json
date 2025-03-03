@@ -6,17 +6,20 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "clean": "del ./build/*",
+    "build": "npm run clean && tsc",
+    "pub": "git add . && git commit -m \"Updating\" && npm version patch && npm run build && npm publish"
   },
   "dependencies": {
-    "expo": "~51.0.28",
+    "expo": "~51.0.39",
     "react": "18.2.0",
     "react-native": "0.74.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~18.2.45",
-    "typescript": "^5.1.3"
+    "typescript": "~5.3.3"
   },
   "private": true,
   "expo": {
