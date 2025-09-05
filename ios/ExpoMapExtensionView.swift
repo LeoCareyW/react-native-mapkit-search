@@ -1,19 +1,9 @@
-// import ExpoModulesCore
-
-// // This view will be used as a native component. Make sure to inherit from `ExpoView`
-// // to apply the proper styling (e.g. border radius and shadows).
-// class ExpoMapExtensionView: ExpoView {
-
-// }
-
 import ExpoModulesCore
 import SwiftUI
 
-class ExpoMapViewModel : ObservableObject {
-    @Published var inputText = "Initial Value"
+class ExpoMapViewModel: ObservableObject {
     @Published var searchText = ""
 }
-
 
 struct ExpoMapView: View {
     @StateObject var viewModel: ExpoMapViewModel
@@ -29,15 +19,12 @@ struct ExpoMapView: View {
     }
 }
 
-
 class ExpoMapExtensionView: ExpoView {
-
     private let contentView: UIHostingController<ExpoMapView>
     let viewModel = ExpoMapViewModel()
 
     let onSubmit: EventDispatcher
     let onSelect: EventDispatcher
-
 
     required init(appContext: AppContext? = nil) {
         onSubmit = EventDispatcher()
@@ -46,10 +33,9 @@ class ExpoMapExtensionView: ExpoView {
         var handleSubmit: (([[String : Any]]) -> Void)?
         var handleSelect: (([[String : Any]]) -> Void)?
 
-
         contentView = UIHostingController(rootView: ExpoMapView(
             viewModel: self.viewModel,
-            onSubmit: { inputText in handleSubmit?(inputText)},
+            onSubmit: { inputText in handleSubmit?(inputText) },
             onSelect: { selectedItem in handleSelect?(selectedItem) }
         ))
 
@@ -68,7 +54,7 @@ class ExpoMapExtensionView: ExpoView {
     }
 
     override func layoutSubviews() {
-        contentView.view.frame = bounds
+        // Since the view is now invisible, we can set minimal frame
+        contentView.view.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
     }
 }
-

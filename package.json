@@ -1,6 +1,6 @@
 {
   "name": "expo-map-extension",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "My new module",
   "main": "build/index.js",
   "types": "build/index.d.ts",
