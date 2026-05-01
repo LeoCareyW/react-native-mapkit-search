@@ -9,6 +9,8 @@ struct SheetView: View {
 
     @Binding var searchText: String
     @Binding var searchResults: [SearchResult]
+    
+    @State private var debounceTask: DispatchWorkItem?
 
     var onSubmit: (([[String : Any]]) -> Void)?
     var onSelect: (([[String : Any]]) -> Void)?
@@ -59,16 +61,26 @@ struct SheetView: View {
             NotificationCenter.default.removeObserver(self)
         }
         .onChange(of: searchText) { oldValue, newValue in
-          print("searchText changed:", newValue)
-            locationService.update(queryFragment: newValue)
-            Task {
-                await MainActor.run {
-                    if let onSubmit = onSubmit {
-                        onSubmit(convertToDictionaryArray(searchCompletions: locationService.completions))
+            // this was changed
+            debounceTask?.cancel() // Cancel any ongoing task
+
+            let task = DispatchWorkItem {
+                locationService.update(queryFragment: newValue)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    Task {
+                        await MainActor.run {
+                            if let onSubmit = onSubmit {
+                                onSubmit(convertToDictionaryArray(searchCompletions: locationService.completions))
+                            }
+                        }
                     }
                 }
             }
-    }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: task) // 0.5s debounce
+
+            debounceTask = task // Store reference for cancellation
+        }
         .padding()
         .presentationDetents(isKeyboardVisible ? [.height(400)] : [.height(150), .large])
         .presentationBackground(.regularMaterial)

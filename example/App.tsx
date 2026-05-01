@@ -1,5 +1,5 @@
 import * as ExpoMapExtension from 'expo-map-extension'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native'
 
 export default function App() {
@@ -8,18 +8,15 @@ export default function App() {
   const [searchText, setSearchText] = useState('')
   const [selectedItem, setSelectedItem] = useState([])
 
-  console.log('>>>>>>>>>>>>>', data)
+  console.log(data)
 
-  // const transformSearchText = (searchText) => {
-  //   return searchText.searchText
-  // }
-
-  console.log('searchText:', searchText)
-  console.log('selected item:', selectedItem[0].placemark)
+  useEffect(() => {
+    console.log('DATAAAA', data)
+  }, [data])
 
   return (
     <View style={styles.container}>
-      <Text style={{ marginTop: 20 }}>Hello There</Text>
+      <Text style={{ marginTop: 50 }}>Hello There</Text>
       <TextInput
         placeholder="Search here"
         value={searchText}
@@ -29,7 +26,6 @@ export default function App() {
       <Button onPress={() => setIsDispay(!isDisplay)} title="Toggle map" />
       {isDisplay && (
         <ExpoMapExtension.ExpoMapExtensionView
-          style={{ flex: 1, height: 1000, width: '100%' }}
           searchText={searchText.toString()}
           onSubmit={(event) => {
             setData(event.nativeEvent.placesData)
