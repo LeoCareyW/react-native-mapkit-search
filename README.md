@@ -1,16 +1,12 @@
 # react-native-mapkit-search
 
-This package is **in no way** associated with Expo. It's name reflects its utility in EAS (expo modules). 
+This package is **in no way** associated with Expo. Its name reflects its utility in EAS (Expo modules).
 
-A React Native package that integrates with Apple's MapKit API to provide location search with autofill suggestions. Designed to work seamlessly with `react-native-maps`, this package enables location-based searches on iOS devices.
+Search for places (restaurants, bars, shops and so on) from React Native using Apple's MapKit, the same search Apple Maps uses. You pass in the search text, and it sends back a list of places with coordinates, address, category and distance from the user.
 
-## Features
+The component doesn't draw anything. You build your own search box and results list, and pair it with something like `react-native-maps` to show places on a map.
 
-- **Search with autofill**: Users can enter a query, and the package returns a list of matching places.
-- **Select a place**: Clicking on a search result passes the selected location back to the React Native app.
-- **Coordinates provided**: Useful for displaying locations on a map or performing other location-based actions.
-- **Seamless integration with `react-native-maps`**: Use this package to fetch locations and display them using `react-native-maps`.
-
+**iOS only** (iOS 17+).
 
 ## Installation
 
@@ -18,63 +14,139 @@ A React Native package that integrates with Apple's MapKit API to provide locati
 npm install expo-map-extension
 ```
 
-or
+Then rebuild your iOS app (`npx expo run:ios`, or `pod install` in `ios/` for a bare project).
 
-```sh
-yarn add expo-map-extension
+### Location permission
+
+Results are centred on the user's location, so your app needs a location permission message. Without it, iOS never asks, searches fall back to central London, and `distanceMeters` is never returned.
+
+In `app.json`:
+
+```json
+{
+  "expo": {
+    "ios": {
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Used to find places near you."
+      }
+    }
+  }
+}
 ```
+
+Or add `NSLocationWhenInUseUsageDescription` to `Info.plist` in a bare project.
 
 ## Usage
 
-```jsx
+```tsx
 import { useState } from 'react'
-import { View, TextInput, Button, Text } from 'react-native'
-import ExpoMapExtension from 'expo-map-extension'
+import { FlatList, Text, TextInput, View } from 'react-native'
+import { ExpoMapExtensionView } from 'expo-map-extension'
 
-const MyComponent = () => {
+export default function PlaceSearch() {
   const [searchText, setSearchText] = useState('')
-  const [placesData, setPlacesData] = useState([])
-  const [selectedItem, setSelectedItem] = useState(null)
+  const [places, setPlaces] = useState([])
 
   return (
     <View style={{ flex: 1 }}>
       <TextInput
-        placeholder="Search here"
+        placeholder="Search for bars, restaurants..."
         value={searchText}
         onChangeText={setSearchText}
-        style={{ borderColor: 'black', borderWidth: 1, borderRadius: 4 }}
       />
-        <ExpoMapExtension.ExpoMapExtensionView
-          style={{ flex: 1, height: 1000, width: '100%' }}
-          searchText={searchText}
-          onSubmit={(event) => setPlacesData(event.nativeEvent.placesData)}
-          onSelect={(event) => setSelectedItem(event.nativeEvent.selectedItem)}
-        />
+
+      <ExpoMapExtensionView
+        searchText={searchText}
+        onSubmit={(e) => setPlaces(e.nativeEvent.placesData)}
+        onSelect={() => {}}
+      />
+
+      <FlatList
+        data={places}
+        keyExtractor={(place) => place.transientId}
+        renderItem={({ item }) => (
+          <Text>
+            {item.title} · {item.address?.neighbourhood ?? item.subTitle}
+          </Text>
+        )}
+      />
     </View>
   )
 }
-
-export default MyComponent
 ```
+
+## How searching works
+
+- A search runs 250ms after the user stops typing, so fast typing doesn't send a request per key.
+- Only the latest search's results are sent back. Older, slower searches are dropped.
+- Clearing the text, or a search with no matches, sends back an empty list.
+- Results are within about 10km of the user, or central London if location isn't available.
+- Category words like "bars" or "coffee" return places of that type, not places with that word in the name.
+- If Apple rate-limits searches, the previous results are kept instead of being cleared.
 
 ## Props
 
-| Prop          | Type     | Description |
-|--------------|---------|-------------|
-| `searchText` | String  | The search query input from React Native. |
-| `onSubmit`   | Function | Callback that receives the list of search results. |
-| `onSelect`   | Function | Callback that receives the selected place's details. |
+| Prop | Type | Description |
+|---|---|---|
+| `searchText` | `string` | What to search for. Update it as the user types. |
+| `onSubmit` | `(event) => void` | Called with the results each time a search finishes. Results are in `event.nativeEvent.placesData`. |
+| `onSelect` | `(event) => void` | Called automatically when a search returns **exactly one** result, with that result in `event.nativeEvent.selectedItem` (an array of one). There's no way to select a place yourself; handle that in your own UI using `placesData`. |
 
-## Example Flow
+## Result fields
 
-1. The user types a query into the search bar.
-2. The sheet view updates with autofilled search results.
-3. The user selects a place from the list.
-4. The selected place data, including coordinates, is passed back to the React Native app.
+Each place in `placesData` looks like this:
+
+```json
+{
+  "id": "mapitem-abc123",
+  "transientId": "6F9619FF-8B86-D011-B42D-00C04FC964FF",
+  "mapItemId": "mapitem-abc123",
+  "title": "The Soho Bar",
+  "subTitle": "12 Greek Street, London, W1D 4DA",
+  "category": "nightlife",
+  "distanceMeters": 412.7,
+  "url": "https://example.com",
+  "phoneNumber": "+44 20 1234 5678",
+  "address": {
+    "streetNumber": "12",
+    "street": "Greek Street",
+    "neighbourhood": "Soho",
+    "city": "London",
+    "county": "Greater London",
+    "state": "England",
+    "postcode": "W1D 4DA",
+    "country": "United Kingdom",
+    "countryCode": "GB"
+  },
+  "placemark": {
+    "name": "The Soho Bar",
+    "coordinate": { "latitude": 51.5136, "longitude": -0.1318 },
+    "region": "..."
+  }
+}
+```
+
+| Field | Notes |
+|---|---|
+| `id` | Stays the same for a place across searches, so it's safe to save. Uses Apple's place ID when there is one (iOS 18+), otherwise the name plus rounded coordinates. |
+| `transientId` | New every search. Use it for React list keys, not for saving. |
+| `mapItemId` | Apple's own place ID. Empty below iOS 18, or when Apple doesn't have one. |
+| `title` | The place's name. |
+| `subTitle` | One-line address: street, city, postcode. |
+| `category` | Apple's place type, e.g. `restaurant`, `nightlife`, `cafe`, `brewery`, `bakery`. Missing if Apple doesn't have one. |
+| `distanceMeters` | Straight-line distance from the user in metres. Missing until the user's location is known. |
+| `url`, `phoneNumber` | Empty string if Apple doesn't have them. |
+| `address` | Address parts. Any part Apple doesn't know is left out, so check each one. |
+| `placemark.coordinate` | Latitude and longitude, e.g. for a map pin. |
+
+Opening hours, ratings and photos aren't available; Apple's MapKit doesn't provide them.
+
+## Upgrading from 1.0.x
+
+- Results now come from `MKLocalSearch` instead of autocomplete, so they're more relevant.
+- `id` is now stable across searches instead of a new random ID each time. Use `transientId` if you relied on it changing.
+- New fields: `transientId`, `mapItemId`, `category`, `distanceMeters`, `address`.
 
 ## License
 
 MIT
-
-
-
